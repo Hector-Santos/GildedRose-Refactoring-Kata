@@ -52,7 +52,7 @@ export class GildedRose {
           continue;
         default:
           this.updateNormal(item);
-          break;
+          continue;
       }
     }
     return this.items;
