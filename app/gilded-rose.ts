@@ -15,7 +15,18 @@ const itemTypes = {
   BACKSTAGE_PASSES: 'Backstage passes to a TAFKAL80ETC concert',
   SULFURAS: 'Sulfuras, Hand of Ragnaros',
   CONJURED: 'Conjured Mana Cake'
-}
+};
+
+const MAX_QUALITY = 50;
+const MIN_QUALITY = 0;
+const SULFURAS_QUALITY = 80;
+const BACKSTAGE_THRESHOLD_FIRST = 10;
+const BACKSTAGE_THRESHOLD_SECOND = 5;
+const QUALITY_INCREMENT = 1;
+const QUALITY_DECREMENT = 1;
+const CONJURED_QUALITY_DECREMENT = 2;
+const BACKSTAGE_INCREMENT_FIRST = 2;
+const BACKSTAGE_INCREMENT_SECOND = 3;
 
 export class GildedRose {
   items: Array<Item>;
@@ -47,12 +58,12 @@ export class GildedRose {
     return this.items;
   }
 
-  private increaseQuality(item: Item, amount: number = 1) {
-    item.quality = Math.min(50, item.quality + amount);
+  private increaseQuality(item: Item, amount: number = QUALITY_INCREMENT) {
+    item.quality = Math.min(MAX_QUALITY, item.quality + amount);
   }
 
-  private decreaseQuality(item: Item, amount: number = 1) {
-    item.quality = Math.max(0, item.quality - amount);
+  private decreaseQuality(item: Item, amount: number = QUALITY_DECREMENT) {
+    item.quality = Math.max(MIN_QUALITY, item.quality - amount);
   }
 
   private updateAgedBrie(item: Item) {
@@ -62,26 +73,26 @@ export class GildedRose {
 
   private updateBackstagePasses(item: Item) {
     item.sellIn--;
-    if (item.sellIn < 0) {
-      item.quality = 0;
-    } else if (item.sellIn < 5) {
-      this.increaseQuality(item, 3);
-    } else if (item.sellIn < 10) {
-      this.increaseQuality(item, 2);
+    if (item.sellIn <= 0) {
+      item.quality = MIN_QUALITY;
+    } else if (item.sellIn < BACKSTAGE_THRESHOLD_SECOND) {
+      this.increaseQuality(item, BACKSTAGE_INCREMENT_SECOND);
+    } else if (item.sellIn < BACKSTAGE_THRESHOLD_FIRST) {
+      this.increaseQuality(item, BACKSTAGE_INCREMENT_FIRST);
     } else {
       this.increaseQuality(item);
     }
   }
 
   private updateSulfuras(item: Item) {
-    item.quality = 80;
+    item.quality = SULFURAS_QUALITY;
   }
 
   private updateConjured(item: Item) {
     item.sellIn--;
-    this.decreaseQuality(item, 2);
+    this.decreaseQuality(item, CONJURED_QUALITY_DECREMENT);
     if (item.sellIn < 0) {
-      this.decreaseQuality(item, 2);
+      this.decreaseQuality(item, CONJURED_QUALITY_DECREMENT);
     }
   }
 
